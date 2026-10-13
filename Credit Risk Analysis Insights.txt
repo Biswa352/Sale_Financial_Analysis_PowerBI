@@ -1,0 +1,130 @@
+CREDIT RISK DASHBOARD — ANALYSIS AND INSIGHTS
+Power BI project by Biswarup Das
+
+1. PROJECT OVERVIEW
+
+This analysis reviews two connected datasets in the Power BI report: 2,000 customer profiles in users_data.csv and 6,146 card records in cards_data.csv. The report has three pages: Customer Financial Health Overview, Card Risk Analysis, and Client Credit Risk Dashboard.
+
+The project is descriptive. It summarizes the supplied customer and card fields; it does not contain transaction histories, repayment outcomes, delinquency records, confirmed fraud labels or loan-default outcomes. Consequently, its visuals should not be described as a predictive credit-risk model or a fraud-detection system.
+
+2. DATA AND MODEL CHECKS
+
+- users_data.csv contains 2,000 rows and 14 columns.
+- cards_data.csv contains 6,146 rows and 13 columns.
+- The customer table has 2,000 unique IDs. The card table has 6,146 unique card-row IDs and references all 2,000 customers through client_id.
+- Every card client_id matched a users_data.id in the supplied files; every customer had at least one associated card row.
+- No blank cells were found in the CSV fields examined.
+- The Power BI model uses a one-to-many relationship from users_data.id to cards_data.client_id, with single-direction filtering.
+
+The card table has multiple rows per customer. Customer attributes repeated beside different card rows in the combined table are expected consequences of that relationship; they should not be interpreted as separate customers.
+
+3. CUSTOMER FINANCIAL PROFILE
+
+Credit score
+
+- Average credit score: 709.73.
+- Median credit score: 711.5.
+- Minimum and maximum scores: 480 and 850.
+- The customer counts by the report's score bands are: Below 580 — 81; 580–669 — 348; 670–739 — 931; 740+ — 640.
+
+These are customer counts. They are different from the Page 3 chart, which counts associated card records within each customer's credit-score band.
+
+Income and debt
+
+- Average yearly income: approximately $45,715.88.
+- Average total debt: approximately $63,709.69.
+- Average per-capita income: approximately $23,141.93.
+
+The figures use the dollar-denominated values as represented in the supplied CSVs and the dashboard. The files themselves do not identify the original data source or separately specify a currency convention beyond the dollar signs in the fields.
+
+Gender comparison
+
+- Female customers: 1,016 (50.8%).
+- Male customers: 984 (49.2%).
+- Average total debt for male customers: approximately $64,113.78.
+- Average total debt for female customers: approximately $63,318.34.
+
+The average debt difference is modest in comparison with the spread of debt values in the full dataset. The chart supports a descriptive comparison only; it does not explain the reason for the difference.
+
+A simple low-score segment
+
+Using a credit_score threshold below 600—also referenced in the accompanying presentation's example of a high-risk rule—132 customers (6.6% of the customer table) fall below that threshold. Their mean total debt is approximately $77,127, compared with approximately $62,762 for customers scoring 600 or above.
+
+This is an exploratory segment, not a validated lending-risk classification. The current dashboard does not display this as a dedicated High Risk Clients KPI. The comparison does not establish that debt causes a low score, or that all customers below 600 are necessarily high risk under a lender's policy.
+
+An additional row-level check found a Pearson correlation of about -0.105 between credit score and total debt. This is a weak negative linear association in these supplied records; it should not be interpreted as a causal relationship.
+
+4. CARD PORTFOLIO FINDINGS
+
+Card records by brand
+
+The current pie visual uses a percentage-of-grand-total calculation based on Count of num_cards_issued. As configured, its percentages represent the share of card records by brand:
+
+- Mastercard: 3,209 records (52.21%).
+- Visa: 2,326 records (37.85%).
+- American Express: 402 records (6.54%).
+- Discover: 209 records (3.40%).
+
+Together, these brands account for all 6,146 card records. Because the visual counts rows rather than summing num_cards_issued, these percentages should be described as record share. If the business question is instead the share of total issued-card units, use Sum of num_cards_issued and update the title accordingly.
+
+Chip status
+
+- 5,500 card records have has_chip = YES; 646 have has_chip = NO.
+- Overall, 89.49% of records have a chip.
+- Chip prevalence by brand: Amex 91.29%, Discover 90.43%, Mastercard 89.37%, Visa 89.25%.
+
+The brand-level percentages are close together, ranging from 89.25% to 91.29%. This does not, by itself, establish differences in fraud or security outcomes.
+
+Card type and average recorded credit limit
+
+- Debit: 3,511 records; average credit_limit approximately $18,557.89.
+- Credit: 2,057 records; average credit_limit approximately $11,174.38.
+- Debit (Prepaid): 578 records; average credit_limit approximately $64.45.
+
+These are averages of the credit_limit field as supplied. The very low average for Debit (Prepaid) should be interpreted cautiously: the field's business meaning for debit and prepaid products is not explained in the supplied project files.
+
+Dark-web indicator
+
+All 6,146 rows have card_on_dark_web = No. The Dark Web Cards DAX measure therefore returns zero, as expected. There are no positive records with which to compare exposed and non-exposed cards or to assess whether one brand is more affected. Claims that Mastercard users are primarily affected, or that particular ages are the most exposed, are not supported by these CSVs and are not presented as findings here.
+
+5. PAGE 3: CARD COUNTS BY CUSTOMER CREDIT-SCORE BAND
+
+The report shows the following counts of card records, grouped using the associated customer's credit-score band:
+
+- 670–739: 2,984 card records.
+- 740+: 2,168 card records.
+- 580–669: 823 card records.
+- Below 580: 171 card records.
+
+The values sum to 6,146. They represent card records, not the number of distinct customers in each band. The corresponding customer counts are 931, 640, 348 and 81 for the same bands, respectively.
+
+6. HOW TO READ THE THREE DASHBOARD PAGES
+
+Page 1 — Customer Financial Health Overview
+
+The page provides average credit score, average total debt and average yearly income KPIs, average debt by gender, customer distribution by gender, average score by birth year and an average-score chart grouped by credit-limit band.
+
+Important validation note: in the current report, the credit-limit-band chart displays approximately 710 for every band and its category labels are not clearly visible in the supplied screenshot. Because Credit Limit Band belongs to cards_data while Avg Credit Score belongs to users_data—and the relationship filters from users to cards only—the card-level band may not filter the score measure. Do not use this visual to claim that average score differs (or does not differ) between credit-limit bands until its filter context and category labels are corrected.
+
+Page 2 — Card Risk Analysis
+
+The page displays the dark-web count and chip percentage, chip prevalence by brand, average recorded credit limit by card type and the brand-composition pie. The zero dark-web count is accurate for this source table, but the all-No field means dark-web exposure cannot be meaningfully compared in this dataset.
+
+Page 3 — Client Credit Risk Dashboard
+
+The scatter chart pairs customer credit score with total debt and labels points by customer ID. The table combines card and customer attributes; multiple card rows can correspond to the same customer. The bar chart counts card records within customer credit-score bands. The gender, chip-status and card-brand slicers were tested interactively and were observed to filter the page visuals.
+
+7. LIMITATIONS AND RECOMMENDED FOLLOW-UP
+
+1. Validate or replace the Page 1 credit-score-by-credit-limit-band chart. The current cross-filter setup produces the same rounded average in each band, so its apparent comparison is not reliable.
+2. Align the card-brand pie chart's title and aggregation. Its title says cards issued, while the current percentage calculation uses Count of num_cards_issued; the shown shares are record shares.
+3. The dataset contains card_number and CVV fields as well as customer addresses and coordinates. Confirm that the records are synthetic and that redistribution is permitted. Remove or mask fields not required for the analysis before publishing the CSVs publicly.
+4. The supplied repository files do not state the original dataset source or provide independent dataset licensing terms. Add source attribution and verify data redistribution rights.
+5. The source data does not include transactions, repayment history, defaults, arrears or confirmed fraud outcomes. Avoid predictive, causal or fraud-detection claims.
+6. The accompanying PowerPoint contains an unfilled date placeholder and assertions about dark-web exposure and age groups that are not supported by the supplied CSV values. Those statements should be revised if the presentation is retained as a portfolio deliverable.
+
+8. CONCLUSION
+
+The report brings together customer financial attributes and card-level information in a three-page Power BI dashboard. The data shows an average credit score of 709.73, average total debt of about $63.71K, and chip availability on 89.49% of card records. Mastercard is the largest brand by record count, while the card type comparison shows higher average recorded credit limits for debit records than for credit or prepaid-debit records.
+
+The most important qualification is that the dark-web indicator is No for every record, so the dataset cannot support claims about dark-web exposure. The credit-score-by-credit-limit-band visual also needs a filter-context correction before it is used for interpretation. Subject to those caveats and data-provenance checks, the report is best presented as an interactive descriptive analysis of customer financial health and card portfolio composition.
